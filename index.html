@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furnace Noise Log</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .form-section {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .radio-option input[type="radio"] {
+            width: auto;
+            cursor: pointer;
+        }
+        
+        .radio-option label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #666;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .logs-section {
+            padding: 30px;
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .logs-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+        
+        .log-count {
+            background: #667eea;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .log-entry {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        
+        .log-entry:hover {
+            transform: translateX(5px);
+        }
+        
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .log-date {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 15px;
+        }
+        
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+        
+        .delete-btn:hover {
+            background: #ee5a6f;
+        }
+        
+        .log-detail {
+            margin: 8px 0;
+            display: flex;
+            gap: 8px;
+            font-size: 14px;
+        }
+        
+        .log-label {
+            font-weight: 600;
+            color: #666;
+            min-width: 140px;
+        }
+        
+        .log-value {
+            color: #333;
+            flex: 1;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .export-btn {
+            background: #10ac84;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+        
+        .export-btn:hover {
+            background: #0d9470;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .form-section,
+            .logs-section {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .log-detail {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .log-label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Furnace Noise Log</h1>
+            <p>Track strange noises from your heating system</p>
+        </div>
+        
+        <div class="form-section">
+            <form id="logForm">
+                <div class="form-group">
+                    <label for="datetime">Date & Time</label>
+                    <input type="datetime-local" id="datetime" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Was the system running?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="running-yes" name="running" value="yes" required>
+                            <label for="running-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="running-no" name="running" value="no">
+                            <label for="running-no">No</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="running-unsure" name="running" value="unsure">
+                            <label for="running-unsure">Not sure</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="duration">How long had it been running? (minutes)</label>
+                    <input type="number" id="duration" placeholder="Leave blank if not applicable" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="noise">Description of the noise</label>
+                    <textarea id="noise" placeholder="Describe what you heard..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="roomTemp">Room temperature (°C)</label>
+                    <input type="number" id="roomTemp" placeholder="e.g., 20" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="outsideTemp">Outside temperature (°C)</label>
+                    <input type="number" id="outsideTemp" placeholder="e.g., 0" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Additional notes</label>
+                    <textarea id="notes" placeholder="Any other observations..."></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="btn-primary">Save Entry</button>
+                    <button type="button" class="btn-secondary" onclick="clearForm()">Clear</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="logs-section">
+            <div class="logs-header">
+                <h2>Log History</h2>
+                <div>
+                    <span class="log-count" id="logCount">0 entries</span>
+                    <button class="export-btn" onclick="exportLogs()">Export</button>
+                </div>
+            </div>
+            <div id="logsList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Set current datetime on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('datetime').value = now.toISOString().slice(0, 16);
+            loadLogs();
+        });
+
+        // Load logs from localStorage
+        function loadLogs() {
+            const logs = JSON.parse(localStorage.getItem('furnaceLogs') || '[]');
+            displayLogs(logs);
+        }
+
+        // Display logs
+        function displayLogs(logs) {
+            const logsList = document.getElementById('logsList');
+            const logCount = document.getElementById('logCount');
+            
+            logCount.textContent = `${logs.length} ${logs.length === 1 ? 'entry' : 'entries'}`;
+            
+            if (logs.length === 0) {
+                logsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📝</div>
+                        <p>No entries yet. Log your first furnace noise above!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort logs by date (newest first)
+            logs.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+            
+            logsList.innerHTML = logs.map((log, index) => `
+                <div class="log-entry">
+                    <div class="log-header">
+                        <div class="log-date">${formatDateTime(log.datetime)}</div>
+                        <button class="delete-btn" onclick="deleteLog(${index})">Delete</button>
+                    </div>
+                    <div class="log-detail">
+                        <span class="log-label">System Running:</span>
+                        <span class="log-value">${capitalizeFirst(log.running)}</span>
+                    </div>
+                    ${log.duration ? `
+                    <div class="log-detail">
+                        <span class="log-label">Running Duration:</span>
+                        <span class="log-value">${log.duration} minutes</span>
+                    </div>
+                    ` : ''}
+                    <div class="log-detail">
+                        <span class="log-label">Noise Description:</span>
+                        <span class="log-value">${log.noise}</span>
+                    </div>
+                    ${log.roomTemp ? `
+                    <div class="log-detail">
+                        <span class="log-label">Room Temperature:</span>
+                        <span class="log-value">${log.roomTemp}°C</span>
+                    </div>
+                    ` : ''}
+                    ${log.outsideTemp ? `
+                    <div class="log-detail">
+                        <span class="log-label">Outside Temperature:</span>
+                        <span class="log-value">${log.outsideTemp}°C</span>
+                    </div>
+                    ` : ''}
+                    ${log.notes ? `
+                    <div class="log-detail">
+                        <span class="log-label">Notes:</span>
+                        <span class="log-value">${log.notes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Format datetime
+        function formatDateTime(datetime) {
+            const date = new Date(datetime);
+            return date.toLocaleString('en-US', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        // Capitalize first letter
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Handle form submission
+        document.getElementById('logForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const logs = JSON.parse(localStorage.getItem('furnaceLogs') || '[]');
+            
+            const newLog = {
+                datetime: document.getElementById('datetime').value,
+                running: document.querySelector('input[name="running"]:checked').value,
+                duration: document.getElementById('duration').value,
+                noise: document.getElementById('noise').value,
+                roomTemp: document.getElementById('roomTemp').value,
+                outsideTemp: document.getElementById('outsideTemp').value,
+                notes: document.getElementById('notes').value
+            };
+            
+            logs.push(newLog);
+            localStorage.setItem('furnaceLogs', JSON.stringify(logs));
+            
+            clearForm();
+            loadLogs();
+            
+            // Scroll to logs section
+            document.querySelector('.logs-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('logForm').reset();
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('datetime').value = now.toISOString().slice(0, 16);
+        }
+
+        // Delete log
+        function deleteLog(index) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                const logs = JSON.parse(localStorage.getItem('furnaceLogs') || '[]');
+                logs.splice(index, 1);
+                localStorage.setItem('furnaceLogs', JSON.stringify(logs));
+                loadLogs();
+            }
+        }
+
+        // Export logs
+        function exportLogs() {
+            const logs = JSON.parse(localStorage.getItem('furnaceLogs') || '[]');
+            
+            if (logs.length === 0) {
+                alert('No logs to export!');
+                return;
+            }
+            
+            // Create CSV content
+            let csv = 'Date & Time,System Running,Duration (min),Noise Description,Room Temp (°C),Outside Temp (°C),Notes\n';
+            
+            logs.forEach(log => {
+                csv += `"${formatDateTime(log.datetime)}",`;
+                csv += `"${capitalizeFirst(log.running)}",`;
+                csv += `"${log.duration || ''}",`;
+                csv += `"${log.noise.replace(/"/g, '""')}",`;
+                csv += `"${log.roomTemp || ''}",`;
+                csv += `"${log.outsideTemp || ''}",`;
+                csv += `"${(log.notes || '').replace(/"/g, '""')}"\n`;
+            });
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `furnace-log-${new Date().toISOString().slice(0, 10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
